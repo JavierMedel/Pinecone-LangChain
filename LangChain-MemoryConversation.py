@@ -2,42 +2,51 @@ import os
 import openai
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # LangChain imports
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.schema.runnable import RunnableMap
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnableMap
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from pinecone import Pinecone
 
-# --------------------------------------------------------
-# 1. Load API keys
-# --------------------------------------------------------
-openai.api_key = os.environ["OPENAI_API_KEY"]
+# Set your API keys for OpenAI and Pinecone
+# Load environment variables
+load_dotenv()
 
-# --------------------------------------------------------
-# 2. Embeddings + Pinecone VectorStore
-# --------------------------------------------------------
-embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+# Get API keys and index name
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 
-pinecone_index_name = "langchain-embeddings-demo"
+# Initialize OpenAI Embeddings using LangChain
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")  # Specify which embedding model
+
+# -------------------------
+# 1. Connect to Pinecone
+# -------------------------
+pc = Pinecone(api_key=PINECONE_API_KEY)
+index = pc.Index(PINECONE_INDEX)
+
+# Connect to the Pinecone index using LangChain's Pinecone wrapper
 vector_store = PineconeVectorStore(
-    index_name=pinecone_index_name,
+    index=index,
     embedding=embeddings
 )
 
-retriever = vector_store.as_retriever(search_kwargs={"k": 1})
+# -------------------------
+# 2. Define the retrieval mechanism
+# -------------------------
+retriever = vector_store.as_retriever(search_kwargs={"k": 1})  # Retrieve top-1 relevant documents
 
 # --------------------------------------------------------
 # 3. LLM Initialization (GPT-4)
 # --------------------------------------------------------
-llm = ChatOpenAI(
-    model="gpt-4",
-    temperature=0.7
-)
+llm = ChatOpenAI( model="gpt-5-nano"
+                 , openai_api_key=OPENAI_API_KEY
+                 , temperature=0.7 )
 
 # --------------------------------------------------------
 # 4. Prompt Template
