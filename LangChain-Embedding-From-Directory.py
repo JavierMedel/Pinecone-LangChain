@@ -15,13 +15,10 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX")
-
-print(OPENAI_API_KEY)
-print(PINECONE_API_KEY)
-print(PINECONE_INDEX)
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 
 # Initialize OpenAI embedding model
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)  # Specify which embedding model
 
 # Load PDF files from a directory
 directory_path = "./papers"

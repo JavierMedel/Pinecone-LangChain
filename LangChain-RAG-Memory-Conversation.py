@@ -20,9 +20,12 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 
 # Initialize OpenAI Embeddings using LangChain
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")  # Specify which embedding model
+embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)  # Specify which embedding model
+
+
 
 # -------------------------
 # 1. Connect to Pinecone
